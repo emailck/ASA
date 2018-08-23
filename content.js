@@ -200,8 +200,8 @@ function initUI(ids) {
     btn0.setAttribute("type", "button");
     btn0.setAttribute("value", "攻击");
     btn0.setAttribute("class", "input-button");
-	if (document.URL.toString().search("fleet") < 0) {
-		btn0.disabled = true;
+	if (document.URL.toString().search("fleet") < 0 && document.URL.toString().search("loc") < 0) {
+		btn0.style.visibility = "hidden";
 	}
     btn0.setAttribute("onclick", "var id = document.getElementById('fleet-form-input').value; if (id.length > 0) window.location.href = 'fleet.aspx?fleet=' + id + '&view=attack'");   
 	form.appendChild(btn0);
@@ -249,17 +249,13 @@ function initUI(ids) {
         x.append(div);
     } else {
 		x = document.getElementsByClassName("top")[0];
-		//div.style.position = "fixed";
 		div.style.float = "left";
 		div.style.position = "relative";
 		div.style.width = "111px";
 		div.style.display = "inline-block";
 		div.style.left = (x.offsetLeft + 850) + "px";
-		console.log(x.parentNode.nextSbiling);
-        //document.body.insertBefore(div, x);
 		document.body.appendChild(div);
 		div.style.top = (-div.offsetTop + x.clientHeight + div.clientHeight) + "px";
-		console.log(div.offsetTop);
     }
     form.addEventListener("submit", checkForm, false);
 }
