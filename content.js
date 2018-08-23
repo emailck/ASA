@@ -1,4 +1,3 @@
-
 function addReport(param) {
     if (param.readyState != 4 || param.status != 200) {
         return;
@@ -31,10 +30,12 @@ function postAsync(url2get, sendstr, sync, referer, callback) {
     req.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     if (referer && referer.length > 0) {
-      req.setRequestHeader("replace_referer", referer);
+        req.setRequestHeader("replace_referer", referer);
     }
     if (sync) {
-        req.onreadystatechange = f => {callback(req);};
+        req.onreadystatechange = f = >{
+            callback(req);
+        };
     }
     req.send(sendstr);
     if (req.readyState == 4 && req.status == 200) {
@@ -97,8 +98,8 @@ function selectFleet(ids) {
         return;
     }
     var body = btns[0].parentNode.parentNode.parentNode.parentNode;
-    var trs =[];
-    for (i = 0 ; i < btns.length; ++i) {
+    var trs = [];
+    for (i = 0; i < btns.length; ++i) {
         trs.push(btns[i].parentNode.parentNode.parentNode);
     }
     for (i = 0; i < trs.length; ++i) {
@@ -122,7 +123,11 @@ function selectFleet(ids) {
             btn3.setAttribute("type", "button");
             btn3.setAttribute("class", "input-button input-button-important");
             btn3.setAttribute("value", "突突突");
-            btn3.addEventListener("click", function(){attack(this, 5);}, false);
+            btn3.addEventListener("click",
+            function() {
+                attack(this, 5);
+            },
+            false);
             btns[i].parentNode.appendChild(btn3);
         }
     }
@@ -146,7 +151,7 @@ function saveIds(table) {
     for (var i = 0; i < tds.length; i++) {
         ids.push(tds[i].getAttribute("value"));
     }
-    localStorage.setItem("ids", ids.length == 0 ? '' : ids.join(','));
+    localStorage.setItem("ids", ids.length == 0 ? '': ids.join(','));
 }
 
 function delRow(row) {
@@ -168,7 +173,11 @@ function addRow(table, id) {
     cell2.setAttribute("class", "btn-normal");
     cell2.style.cursor = "pointer";
     cell2.style.textAlign = "center";
-    cell2.addEventListener("click", function(){delRow(this.parentNode);}, false);
+    cell2.addEventListener("click",
+    function() {
+        delRow(this.parentNode);
+    },
+    false);
 }
 
 function showFleet() {
@@ -181,19 +190,19 @@ function showFleet() {
         return;
     }
     var tbody = div.getElementsByTagName("tbody");
-    if (!tbody || tbody.length <=0) {
+    if (!tbody || tbody.length <= 0) {
         return;
     }
-    
+
     for (var i = 0; i < tbody[0].length; ++i) {
-        
-    }
+
+}
 }
 
 function initUI(ids) {
     var div = document.createElement("div");
     div.setAttribute("id", "base_div");
-    div.style.zIndex= "9999";
+    div.style.zIndex = "9999";
     var span = document.createElement("span");
     span.setAttribute("class", "galaxy");
     span.style.cursor = "default";
@@ -251,7 +260,7 @@ function initUI(ids) {
     div.appendChild(form);
     var table = document.createElement("table");
     table.style.width = form.style.width;
-    table.setAttribute("id","ids-table");
+    table.setAttribute("id", "ids-table");
     table.setAttribute("class", "layout listing btnlisting tbllisting1 sorttable");
     for (var i = 0; i < ids.length; ++i) {
         addRow(table, ids[i]);
@@ -260,24 +269,24 @@ function initUI(ids) {
 
     var x = document.getElementById("background-content");
     if (x) {
-    div.style.float = "right";
-    div.style.position = "relative";
-    div.setAttribute("class", "ui-draggable");
-    div.style.width = "131px";
-    div.style.display = "inline-block";
-    div.style.zIndex= "9999";
-    div.style.left = "150px";
-    div.style.top = "-" + (x.clientHeight - 150)  + "px";
+        div.style.float = "right";
+        div.style.position = "relative";
+        div.setAttribute("class", "ui-draggable");
+        div.style.width = "131px";
+        div.style.display = "inline-block";
+        div.style.zIndex = "9999";
+        div.style.left = "150px";
+        div.style.top = "-" + (x.clientHeight - 150) + "px";
         x.append(div);
     } else {
-    x = document.getElementsByClassName("top")[0];
-    div.style.float = "left";
-    div.style.position = "relative";
-    div.style.width = "111px";
-    div.style.display = "inline-block";
-    div.style.left = (x.offsetLeft + 850) + "px";
-    document.body.appendChild(div);
-    	div.style.top = (-div.offsetTop + x.clientHeight + div.clientHeight) + "px";
+        x = document.getElementsByClassName("top")[0];
+        div.style.float = "left";
+        div.style.position = "relative";
+        div.style.width = "111px";
+        div.style.display = "inline-block";
+        div.style.left = (x.offsetLeft + 850) + "px";
+        document.body.appendChild(div);
+        div.style.top = ( - div.offsetTop + x.clientHeight + div.clientHeight) + "px";
     }
     form.addEventListener("submit", checkForm, false);
 }
