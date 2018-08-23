@@ -9,9 +9,9 @@ function addReport(param) {
     }
     var offset2 = param.responseText.indexOf("</small>", offset);
     var str = param.responseText.substring(offset, offset2);
-	var strs = param.responseText.substring(offset, offset2).split(';');
-	strs[0].replace(/.*: /, "");
-	strs[1].replace(/.*:/, "");
+    var strs = param.responseText.substring(offset, offset2).split(';');
+    strs[0].replace(/.*: /, "");
+    strs[1].replace(/.*:/, "");
     var report = document.createElement('p');
     report.innerHTML = strs[0].replace(/.*: /, "") + strs[1].replace(/.*:/, "vs").replace(/ .$/, "");
     report.style.color = "#FF0000";
@@ -30,10 +30,10 @@ function postAsync(url2get, sendstr, sync, referer, callback) {
     req.open("POST", url2get, sync);
     req.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	if (referer && referer.length > 0) {
-		req.setRequestHeader("replace_referer", referer);
-	}
-	if (sync) {
+    if (referer && referer.length > 0) {
+      req.setRequestHeader("replace_referer", referer);
+    }
+    if (sync) {
         req.onreadystatechange = f => {callback(req);};
     }
     req.send(sendstr);
@@ -167,8 +167,27 @@ function addRow(table, id) {
     cell2.innerHTML = "删除";
     cell2.setAttribute("class", "btn-normal");
     cell2.style.cursor = "pointer";
-	cell2.style.textAlign = "center";
+    cell2.style.textAlign = "center";
     cell2.addEventListener("click", function(){delRow(this.parentNode);}, false);
+}
+
+function showFleet() {
+    var reg = /loc=[A-Z]:\d{2}:\d{2}:\d{2}:\d{2}$/;
+    if (!window.URL.toString().match(/loc=[A-Z]:\d{2}:\d{2}:\d{2}:\d{2}$/)) {
+        return;
+    }
+    var div = document.getElementById("map_fleets");
+    if (!div) {
+        return;
+    }
+    var tbody = div.getElementsByTagName("tbody");
+    if (!tbody || tbody.length <=0) {
+        return;
+    }
+    
+    for (var i = 0; i < tbody[0].length; ++i) {
+        
+    }
 }
 
 function initUI(ids) {
@@ -200,11 +219,14 @@ function initUI(ids) {
     btn0.setAttribute("type", "button");
     btn0.setAttribute("value", "攻击");
     btn0.setAttribute("class", "input-button");
-	if (document.URL.toString().search("fleet") < 0 && document.URL.toString().search("loc") < 0) {
-		btn0.style.visibility = "hidden";
-	}
-    btn0.setAttribute("onclick", "var id = document.getElementById('fleet-form-input').value; if (id.length > 0) window.location.href = 'fleet.aspx?fleet=' + id + '&view=attack'");   
-	form.appendChild(btn0);
+    if (document.URL.toString().search("fleet") < 0 && document.URL.toString().search("loc") < 0) {
+        //btn0.style.visibility = "hidden";
+        btn0.disabled = true;
+        btn0.style.pointerEvents = "none";
+        btn0.style.color = "#8E8E8E";
+    }
+    btn0.setAttribute("onclick", "var id = document.getElementById('fleet-form-input').value; if (id.length > 0) window.location.href = 'fleet.aspx?fleet=' + id + '&view=attack'");
+    form.appendChild(btn0);
 
     span = document.createElement("span");
     span.setAttribute("class", "galaxy");
@@ -236,26 +258,26 @@ function initUI(ids) {
     }
     div.appendChild(table);
 
-	var x = document.getElementById("background-content");
+    var x = document.getElementById("background-content");
     if (x) {
-		div.style.float = "right";
-		div.style.position = "relative";
-		div.setAttribute("class", "ui-draggable");
-		div.style.width = "131px";
-		div.style.display = "inline-block";
-		div.style.zIndex= "9999";
-		div.style.left = "150px";
-		div.style.top = "-" + (x.clientHeight - 150)  + "px";
+    div.style.float = "right";
+    div.style.position = "relative";
+    div.setAttribute("class", "ui-draggable");
+    div.style.width = "131px";
+    div.style.display = "inline-block";
+    div.style.zIndex= "9999";
+    div.style.left = "150px";
+    div.style.top = "-" + (x.clientHeight - 150)  + "px";
         x.append(div);
     } else {
-		x = document.getElementsByClassName("top")[0];
-		div.style.float = "left";
-		div.style.position = "relative";
-		div.style.width = "111px";
-		div.style.display = "inline-block";
-		div.style.left = (x.offsetLeft + 850) + "px";
-		document.body.appendChild(div);
-		div.style.top = (-div.offsetTop + x.clientHeight + div.clientHeight) + "px";
+    x = document.getElementsByClassName("top")[0];
+    div.style.float = "left";
+    div.style.position = "relative";
+    div.style.width = "111px";
+    div.style.display = "inline-block";
+    div.style.left = (x.offsetLeft + 850) + "px";
+    document.body.appendChild(div);
+    	div.style.top = (-div.offsetTop + x.clientHeight + div.clientHeight) + "px";
     }
     form.addEventListener("submit", checkForm, false);
 }
