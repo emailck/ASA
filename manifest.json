@@ -1,0 +1,27 @@
+{
+  "name": "AE Super Attack",
+  "manifest_version": 2,
+  "version": "1.0",
+  "description": "AE Super attack",
+  "content_scripts": [
+    {
+      "matches": ["http://*.astroempires.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "browser_action": {
+        "default_title": "Super attack",
+        "default_icon": "icon.png"
+    },
+   "permissions": [
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"http://*.astroempires.com/*"
+	],
+    "background": {
+	    "scripts": [
+			"background.js"
+		]
+	}
+}
