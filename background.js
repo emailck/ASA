@@ -14,10 +14,15 @@ function replaceReferer(request) {
 			headers.push(header);
 		}
 	}
-	if (headers.length == 0 || !referer || !replace_referer) {
+	if (headers.length == 0 || !referer) {
 		return;
 	}
-	referer.value = replace_referer.value;
+	if (referer.value && request.url.toString().match(/&view=attack$/)) {
+		referer.value = request.url.toString().replace(/&view=attack$/, "");
+	}
+	if (replace_referer) {
+		referer.value = replace_referer.value;
+	}
 	return {requestHeaders: headers};
 }
 
