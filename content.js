@@ -2,17 +2,14 @@ function addReport(param) {
     if (param.readyState != 4 || param.status != 200) {
         return;
     }
-    var offset = param.responseText.indexOf("<small>(", 1000);
+    var offset = param.responseText.indexOf("<small>(");
     if (offset < 0) {
         return;
     }
     var offset2 = param.responseText.indexOf("</small>", offset);
-    var str = param.responseText.substring(offset, offset2);
-    var strs = param.responseText.substring(offset, offset2).split(';');
-    strs[0].replace(/.*: /, "");
-    strs[1].replace(/.*:/, "");
+    var str = param.responseText.substring(offset + 7, offset2).replace(/\( .*: (\d{1,}) ; .*: (\d{1,}) \)/, "$1 vs $2");
     var report = document.createElement('p');
-    report.innerHTML = strs[0].replace(/.*: /, "") + strs[1].replace(/.*:/, "vs").replace(/ .$/, "");
+    report.innerHTML = str;
     report.style.color = "#FF0000";
     report.setAttribute("class", "myreport");
     var div = document.getElementById("base_div");
@@ -33,7 +30,7 @@ function postAsync(url2get, sendstr, sync, referer, callback) {
         req.setRequestHeader("replace_referer", referer);
     }
     if (sync) {
-        req.onreadystatechange = (req) => {
+        req.onreadystatechange = () => {
             callback(req);
         };
     }
@@ -73,7 +70,8 @@ function attack(btn, times) {
     var repair_href = url.protocol + "//" + url.host + "/fleet.aspx?fleet=" + url.searchParams.get("fleet") + "&ch=1&action=repair&unit=all";
 	var rand_time = 126;
     for (i = 0; i < times; ++i) {
-		rand_time += 108 + Math.floor(Math.random() * 128);
+		rand_time += 208 + Math.floor(Math.random() * 128);
+		console.log(rand_time);
 		window.setTimeout(() => {
 			postAsync(form.action.toString(), post_data.join('&'), true, form.action.toString(), addReport);
 		}, rand_time);
