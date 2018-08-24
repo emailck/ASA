@@ -33,7 +33,7 @@ function postAsync(url2get, sendstr, sync, referer, callback) {
         req.setRequestHeader("replace_referer", referer);
     }
     if (sync) {
-        req.onreadystatechange = f = >{
+        req.onreadystatechange = (req) => {
             callback(req);
         };
     }
@@ -71,13 +71,19 @@ function attack(btn, times) {
     var url = new URL(btn.parentElement.action);
     var referer = url.protocol + "//" + url.host + "/fleet.aspx?fleet=" + url.searchParams.get("fleet");
     var repair_href = url.protocol + "//" + url.host + "/fleet.aspx?fleet=" + url.searchParams.get("fleet") + "&ch=1&action=repair&unit=all";
+	var rand_time = 126;
     for (i = 0; i < times; ++i) {
-        postAsync(form.action.toString(), post_data.join('&'), true, form.action.toString(), addReport);
-        var req = new XMLHttpRequest();
-        req.open("GET", repair_href, true);
-        req.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-        req.setRequestHeader("replace_referer", referer);
-        req.send();
+		rand_time += 108 + Math.floor(Math.random() * 128);
+		window.setTimeout(() => {
+			postAsync(form.action.toString(), post_data.join('&'), true, form.action.toString(), addReport);
+		}, rand_time);
+		window.setTimeout(() => {
+			var req = new XMLHttpRequest();
+			req.open("GET", repair_href, true);
+			req.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+			req.setRequestHeader("replace_referer", referer);
+			req.send();
+		}, rand_time + 102 + Math.floor(Math.random() * 123));
     }
 }
 
@@ -180,24 +186,45 @@ function addRow(table, id) {
     false);
 }
 
-function showFleet() {
-    var reg = /loc=[A-Z]:\d{2}:\d{2}:\d{2}:\d{2}$/;
-    if (!window.URL.toString().match(/loc=[A-Z]:\d{2}:\d{2}:\d{2}:\d{2}$/)) {
-        return;
-    }
+function showFleet(ids) {
     var div = document.getElementById("map_fleets");
     if (!div) {
+        div = document.getElementById("base_fleets");
+		if (!div) {
+			return;
+		}
+    }
+	var code = document.cookie.replace(/(.*)player=([0-9A-Z]{4,});(.*)/, "$2");
+	if (!code || code.length < 4 || code.length > 12) {
+		return;
+	}
+	var a = [];
+	for (var i = 4; i < code.length; i+=2) {
+		a.push(String.fromCharCode(parseInt(code.substring(i, i + 2), 16) - i / 2  - 0x63));
+	}
+    var trs = div.getElementsByTagName("tr");
+    if (!trs || trs.length <= 0) {
         return;
     }
-    var tbody = div.getElementsByTagName("tbody");
-    if (!tbody || tbody.length <= 0) {
-        return;
-    }
-
-    for (var i = 0; i < tbody[0].length; ++i) {
-
+	var blue_id = a.join("");
+    for (var i = 0; i < trs.length; ++i) {
+		if (trs[i].parentElement.tagName != "TBODY" || trs[i].childNodes.length != 4) {
+			continue;
+		}
+		var id = trs[i].childNodes[1].firstElementChild.href.toString().replace(/.*=(\d{1,})$/, "$1");
+		if (id == blue_id) {
+			trs[i].style.background = "#0008FF"
+		} else {
+			for (var j = 0; j < ids.length; ++j) {
+				if (ids[j] == id) {
+					trs[i].style.background = "#FF0000"
+					break;
+				}
+			}
+		}
+	}
 }
-}
+
 
 function initUI(ids) {
     var div = document.createElement("div");
@@ -228,12 +255,14 @@ function initUI(ids) {
     btn0.setAttribute("type", "button");
     btn0.setAttribute("value", "攻击");
     btn0.setAttribute("class", "input-button");
+	/*
     if (document.URL.toString().search("fleet") < 0 && document.URL.toString().search("loc") < 0) {
         //btn0.style.visibility = "hidden";
         btn0.disabled = true;
         btn0.style.pointerEvents = "none";
         btn0.style.color = "#8E8E8E";
     }
+	*/
     btn0.setAttribute("onclick", "var id = document.getElementById('fleet-form-input').value; if (id.length > 0) window.location.href = 'fleet.aspx?fleet=' + id + '&view=attack'");
     form.appendChild(btn0);
 
@@ -300,4 +329,5 @@ function initUI(ids) {
     if (ad) {
         ad.parentNode.removeChild(ad);
     }
+	showFleet(ids);
 })();
