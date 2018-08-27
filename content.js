@@ -40,7 +40,20 @@ function postAsync(url2get, sendstr, sync, referer, callback) {
     }
 }
 
-function attack(btn, times) {
+function repair(id) {
+    var url = new URL(document.URL);
+    var req = new XMLHttpRequest();
+    req.open("GET", "/fleet.aspx?fleet=" + id + "&ch=1&action=repair&unit=all", true);;
+    req.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+    req.setRequestHeader("replace_referer", url.protocol + "//" + url.host + "/fleet.aspx?fleet=" + id);
+    req.send();
+}
+
+function attack(btn) {
+    if (btn.getAttribute("form_param")) {
+        postAsync(btn.getAttribute("from_action"), btn.getAttribute("form_param"), true, btn.getAttribute("from_action"), addReport);
+        return;
+    }
     var res_str = postAsync(btn.parentElement.action, "form=true", false);
     if (!res_str) {
         return;
@@ -65,24 +78,9 @@ function attack(btn, times) {
     if (post_data.length == 0) {
         return;
     }
-    var url = new URL(btn.parentElement.action);
-    var referer = url.protocol + "//" + url.host + "/fleet.aspx?fleet=" + url.searchParams.get("fleet");
-    var repair_href = url.protocol + "//" + url.host + "/fleet.aspx?fleet=" + url.searchParams.get("fleet") + "&ch=1&action=repair&unit=all";
-	var rand_time = 126;
-    for (i = 0; i < times; ++i) {
-		rand_time += 208 + Math.floor(Math.random() * 128);
-		console.log(rand_time);
-		window.setTimeout(() => {
-			postAsync(form.action.toString(), post_data.join('&'), true, form.action.toString(), addReport);
-		}, rand_time);
-		window.setTimeout(() => {
-			var req = new XMLHttpRequest();
-			req.open("GET", repair_href, true);
-			req.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-			req.setRequestHeader("replace_referer", referer);
-			req.send();
-		}, rand_time + 102 + Math.floor(Math.random() * 123));
-    }
+    btn.setAttribute("form_param", post_data.join("&"));
+    btn.setAttribute("from_action", form.action.toString());
+    postAsync(btn.getAttribute("from_action"), btn.getAttribute("form_param"), true, btn.getAttribute("from_action"), addReport);    
 }
 
 function selectFleet(ids) {
@@ -126,13 +124,21 @@ function selectFleet(ids) {
             var btn3 = document.createElement("input");
             btn3.setAttribute("type", "button");
             btn3.setAttribute("class", "input-button input-button-important");
-            btn3.setAttribute("value", "突突突");
+            btn3.setAttribute("value", "一键");
             btn3.addEventListener("click",
             function() {
-                attack(this, 5);
+                attack(this);
             },
             false);
             btns[i].parentNode.appendChild(btn3);
+            var btn4 = document.createElement("input");
+            btn4.setAttribute("type", "button");
+            btn4.setAttribute("class", "input-button");
+            btn4.setAttribute("value", "维修");
+            btns[i].parentNode.appendChild(btn4);
+            btn4.onclick = () => {
+                repair(btn4.parentNode.action.toString().replace(/.*fleet=(\d{1,})&attack=.*/, "$1"));
+            }
         }
     }
 }
@@ -188,39 +194,39 @@ function showFleet(ids) {
     var div = document.getElementById("map_fleets");
     if (!div) {
         div = document.getElementById("base_fleets");
-		if (!div) {
-			return;
-		}
+        if (!div) {
+            return;
+        }
     }
-	var code = document.cookie.replace(/(.*)player=([0-9A-Z]{4,});(.*)/, "$2");
-	if (!code || code.length < 4 || code.length > 12) {
-		return;
-	}
-	var a = [];
-	for (var i = 4; i < code.length; i+=2) {
-		a.push(String.fromCharCode(parseInt(code.substring(i, i + 2), 16) - i / 2  - 0x63));
-	}
+    var code = document.cookie.replace(/(.*)player=([0-9A-Z]{4,});(.*)/, "$2");
+    if (!code || code.length < 4 || code.length > 12) {
+        return;
+    }
+    var a = [];
+    for (var i = 4; i < code.length; i+=2) {
+        a.push(String.fromCharCode(parseInt(code.substring(i, i + 2), 16) - i / 2  - 0x63));
+    }
     var trs = div.getElementsByTagName("tr");
     if (!trs || trs.length <= 0) {
         return;
     }
-	var blue_id = a.join("");
+    var blue_id = a.join("");
     for (var i = 0; i < trs.length; ++i) {
-		if (trs[i].parentElement.tagName != "TBODY" || trs[i].childNodes.length != 4) {
-			continue;
-		}
-		var id = trs[i].childNodes[1].firstElementChild.href.toString().replace(/.*=(\d{1,})$/, "$1");
-		if (id == blue_id) {
-			trs[i].style.background = "#0008FF"
-		} else {
-			for (var j = 0; j < ids.length; ++j) {
-				if (ids[j] == id) {
-					trs[i].style.background = "#FF0000"
-					break;
-				}
-			}
-		}
-	}
+        if (trs[i].parentElement.tagName != "TBODY" || trs[i].childNodes.length != 4) {
+            continue;
+        }
+        var id = trs[i].childNodes[1].firstElementChild.href.toString().replace(/.*=(\d{1,})$/, "$1");
+        if (id == blue_id) {
+            trs[i].style.background = "#007A2B"
+        } else {
+            for (var j = 0; j < ids.length; ++j) {
+                if (ids[j] == id) {
+                    trs[i].style.background = "#FF0000"
+                    break;
+                }
+            }
+        }
+    }
 }
 
 
@@ -253,14 +259,14 @@ function initUI(ids) {
     btn0.setAttribute("type", "button");
     btn0.setAttribute("value", "攻击");
     btn0.setAttribute("class", "input-button");
-	/*
+    /*
     if (document.URL.toString().search("fleet") < 0 && document.URL.toString().search("loc") < 0) {
         //btn0.style.visibility = "hidden";
         btn0.disabled = true;
         btn0.style.pointerEvents = "none";
         btn0.style.color = "#8E8E8E";
     }
-	*/
+    */
     btn0.setAttribute("onclick", "var id = document.getElementById('fleet-form-input').value; if (id.length > 0) window.location.href = 'fleet.aspx?fleet=' + id + '&view=attack'");
     form.appendChild(btn0);
 
@@ -327,5 +333,5 @@ function initUI(ids) {
     if (ad) {
         ad.parentNode.removeChild(ad);
     }
-	showFleet(ids);
+    showFleet(ids);
 })();
